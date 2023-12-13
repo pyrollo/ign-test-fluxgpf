@@ -1,6 +1,8 @@
 package fr.ignfab.geotools;
 
 import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.File;
 
 import java.net.URL;
 import java.net.URLConnection;
@@ -107,11 +109,39 @@ public class App
         }
 	}
 
+    public static void fromFile() throws Exception
+    {
+		CoordinateReferenceSystem wgs84Crs = CRS.decode("EPSG:4326");
+
+        /* get the stream */
+        InputStream rawDataStream = new FileInputStream(new File("wfs.xml"));
+            
+        //treat the stream
+        GML gml = new GML(Version.GML3);
+
+		gml.setCoordinateReferenceSystem(wgs84Crs);
+
+		SimpleFeatureCollection features = gml.decodeFeatureCollection(rawDataStream);
+
+        if(features != null) {
+            System.out.println("Number of features : " + String.valueOf(features.size()));
+
+            SimpleFeatureIterator it = features.features();
+            while (it.hasNext()) {
+                System.out.println("NEXT FEATURE");
+                SimpleFeature currentFeature = it.next();
+            }
+        } else {
+            System.out.println("FEATURES NULL");
+        }
+	}
+
     public static void main( String[] args ) throws Exception
     {
         System.out.println("\nHERE IS THE STARTING POINT OF EVERYTHING" );
         //App.fromURL();
-        App.wfsng();
+        App.fromFile();
+        //App.wfsng();
         System.out.println("THIS IS THE END OF TIMES\n");
     }
 
