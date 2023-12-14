@@ -25,10 +25,9 @@ import org.geotools.api.data.DataStoreFinder;
 import org.geotools.api.data.DataStore;
 import org.geotools.api.data.FeatureSource;
 import org.geotools.api.data.FeatureSource;
-/**
- * Hello world!
- *
- */
+
+import org.apache.poi.util.ReplacingInputStream;
+
 public class App 
 {
 
@@ -87,8 +86,22 @@ public class App
         /* get the stream */
         URL urlGetFeature = new URL(url);
         URLConnection urlConnection = urlGetFeature.openConnection();
-        InputStream rawDataStream = urlConnection.getInputStream();
-            
+//        InputStream rawDataStream = urlConnection.getInputStream();
+        InputStream rawDataStream = new ReplacingInputStream(
+            new ReplacingInputStream(
+                urlConnection.getInputStream(),
+                "wfs:member", "gml:featureMembers"),
+            "http://BDTOPO_V3".getBytes("UTF-8"), "http://BDTOPOV3".getBytes("UTF-8"));
+/*
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        int b;
+        while (-1 != (b = rawDataStream.read()))
+            bos.write(b);
+
+        System.out.println(new String(bos.toByteArray()));
+*/
+
         //treat the stream
         GML gml = new GML(Version.GML3);
 
@@ -107,6 +120,7 @@ public class App
         } else {
             System.out.println("FEATURES NULL");
         }
+  
 	}
 
     public static void fromFile() throws Exception
@@ -139,8 +153,8 @@ public class App
     public static void main( String[] args ) throws Exception
     {
         System.out.println("\nHERE IS THE STARTING POINT OF EVERYTHING" );
-        //App.fromURL();
-        App.fromFile();
+        App.fromURL();
+        //App.fromFile();
         //App.wfsng();
         System.out.println("THIS IS THE END OF TIMES\n");
     }
